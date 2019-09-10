@@ -60,15 +60,15 @@ const getColumns = (rootDir) => [
     dataIndex: 'testFilePath',
     key: 'name',
     render: text => {
-      const relativePath = text.replace(new RegExp('^' + rootDir), '')
+      const relativePath = rootDir ? text.replace(new RegExp('^' + rootDir), '') : text
       return <span>
         <span className='copy_icon' title='click to copy path to clipborad'>
           <Icon type='file' theme='twoTone'
             onClick={() => {
-              const execCommand = 'npx jest .' + relativePath
-              copy(execCommand)
-              message.success('Copy succeed! The command has been copied to the clipboard.')
-            }} />
+              copy(relativePath)
+              message.success('Copy succeed! The path has been copied to the clipboard.')
+            }}
+          />
         </span>
         <span className='path_text' id={text} > {relativePath}</span>
       </span>
@@ -113,7 +113,7 @@ const getColumns = (rootDir) => [
     width: '100px',
     title: 'Action',
     key: 'operation',
-    render: ({ failureMessage }) => <ErrorButton failureMessage={failureMessage} />
+    render: ({ failureMessage, timelineTraceLink }) => <ErrorButton failureMessage={failureMessage} timelineTraceLink={timelineTraceLink} />,
   },
 ]
 
@@ -134,7 +134,7 @@ const TableItem = ({ testResults, config: { rootDir }, globalExpandState }) =>
             return getRecordClass(status, index)
           }}
           expandedRowRender={
-            ({ testResults }) => <DetailTable data={testResults} />
+            ({ testResults, timelineTraceLink }) => <DetailTable data={testResults.map((testResult) => ({ ...testResult, timelineTraceLink }))} />
           }
           expandedRowKeys={getExistKeys(expand, globalExpandState)}
           onExpand={(state, { testFilePath }) => toggleExpand({ key: testFilePath, state })}

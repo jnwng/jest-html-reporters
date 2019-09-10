@@ -65,7 +65,7 @@ const columns = [
     width: '100px',
     title: 'action',
     key: 'operation',
-    render: ({ failureMessages }) => <ErrorButton failureMessage={failureMessages[0]} />
+    render: ({ failureMessages, timelineTraceLink }) => <ErrorButton failureMessage={failureMessages[0]} timelineTraceLink={timelineTraceLink} />
   }
 ]
 

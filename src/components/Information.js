@@ -15,7 +15,7 @@ const colors = [...new Array(40)].map(d => randomColor())
 const CustomTooltip = ({ active, payload, label, rootDir }) => {
   if (active) {
     const { time, name, numFailingTests, numPassingTests, numPendingTests, testResults } = payload[0].payload
-    const relativePath = name.replace(new RegExp('^' + rootDir), '')
+    const relativePath = rootDir ? name.replace(new RegExp('^' + rootDir), '') : name
     const lists = [
       { icon: <TimeIcon />, title: 'Time', content: `${time} S` },
       { icon: <Icon type='file' theme='outlined' />, title: 'Name', content: relativePath },
@@ -109,7 +109,6 @@ const LabelInfo = ({ title, icon, context }) =>
 const Information = ({
   config: {
     rootDir,
-    maxWorkers
   },
   startTime,
   endTime,
@@ -119,46 +118,23 @@ const Information = ({
     {
       ({ toggleExpand }) => (
         <Row>
-          <Col span={18}>
-            <SimpleBarChart data={testResults} rootDir={rootDir} />
-          </Col>
-          <Col span={6}>
-            <p className='chart_title'>
-              <Icon type='pie-chart' theme='filled' style={{ marginRight: '5px' }} />
-            Ratio
-            </p>
-            <ResponsiveContainer width={'100%'} height={300}>
-              <PieChart>
-                <Pie
-                  data={getFormatData(testResults)}
-                  dataKey='time'
-                  cx='50%'
-                  cy='50%'
-                  outerRadius={'90%'}
-                  onClick={({ name }) => { scrollTo(name, toggleExpand) }}
-                  animationDuration={500} >
-                  {
-                    testResults.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={colors[index % 40]} />
-                    ))
-                  }
-                </Pie>
-              </PieChart>
-            </ResponsiveContainer>
-          </Col>
           <Col span={24} className='main_information'>
             <Card>
               <Row span={24}>
                 <Col span={16}>
-                  <LabelInfo title='StartTime' context={formatDate(startTime)} icon={<Icon type='box-plot' theme='filled' />} />
-                  <LabelInfo title='Time' context={getFormatTime(startTime, endTime)} icon={<Icon type='clock-circle' theme='filled' />} />
-                  <LabelInfo title='RootDir' context={rootDir} icon={<Icon type='folder' theme='filled' />} />
-                </Col>
-                <Col span={8}>
-                  <LabelInfo title='MaxWorkers' context={maxWorkers} icon={<Icon type='compass' theme='filled' />} />
+                  <LabelInfo title='Start time' context={formatDate(startTime)} icon={<Icon type='box-plot' theme='filled' />} />
+                  <LabelInfo title='Total time' context={getFormatTime(startTime, endTime)} icon={<Icon type='clock-circle' theme='filled' />} />
+                  {
+                    rootDir ? (
+                      <LabelInfo title='RootDir' context={rootDir} icon={<Icon type='folder' theme='filled' />} />
+                    ) : null
+                  }
                 </Col>
               </Row>
             </Card>
+          </Col>
+          <Col span={24}>
+            <SimpleBarChart data={testResults} rootDir={rootDir} />
           </Col>
         </Row>
       )

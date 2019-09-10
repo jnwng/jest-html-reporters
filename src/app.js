@@ -17,7 +17,16 @@ let data
 if (process.env.NODE_ENV === 'production') {
   data = JSON.parse(window.resData)
 } else {
-  data = require('./devMock.json')
+  const jsonReport = require('./devMock.json')
+  data = {
+    ...jsonReport,
+    config: {},
+    endTime: jsonReport.testResults
+      .map(({ perfStats: { end } }) => end)
+      .sort()
+      .pop(),
+    _reporterOptions: {},
+  }
 }
 window.realData = data
 
